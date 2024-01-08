@@ -8,7 +8,7 @@ import io
 import json
 from pathlib import Path
 from typing import Tuple, Optional
-from modules import scripts
+from modules import scripts, ui_components
 
 import numpy as np
 import cv2
@@ -23,8 +23,9 @@ from modules.paths import models_path
 
 from basicsr.utils.download_util import load_file_from_url
 
+from modules.ui import setup_progressbar
 
-CI_VERSION="0.0.1a"
+from datetime import datetime
 
 #Default values
 
@@ -36,11 +37,11 @@ kohya_show_ti_tab = True
 kohya_show_finetuning_tab = True
 kohya_show_utilities_tab = True
 kohya_show_about_tab = True
+kohya_show_service_tab = True
 p_category = "training"
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-#root_dir = Path(scripts.basedir()).parent.parent.parent
 root_dir = Path(BASE_PATH).parent.parent
 req_file = os.path.join(Path(BASE_PATH).parent, "requirements.txt")
 kohya_path = os.path.join(Path(BASE_PATH).parent, "kohya")
@@ -59,7 +60,16 @@ kohya_show_ti_tab            = shared.opts.data.get("kohya_show_ti_tab",        
 kohya_show_finetuning_tab    = shared.opts.data.get("kohya_show_finetuning_tab",   kohya_show_finetuning_tab)
 kohya_show_utilities_tab     = shared.opts.data.get("kohya_show_utilities_tab",    kohya_show_utilities_tab)
 kohya_show_about_tab         = shared.opts.data.get("kohya_show_about_tab",        kohya_show_about_tab)
+kohya_show_service_tab       = shared.opts.data.get("kohya_show_service_tab",      kohya_show_service_tab)
 
+def get_kohya_tab_names():
+    return ["dreambooth",
+        "lora"
+        "texturalinversion",
+        "finetuning",
+        "utilities",
+        "about"
+        ]
 
 repo_dir = os.listdir(kohya_path)
 
@@ -93,7 +103,7 @@ def install_requirements(req_file):
                     if installed_version != package_version:
                         launch.run_pip(
                             f"install -U {package}",
-                            f"sd-webui-controlnet requirement: changing {package_name} version from {installed_version} to {package_version}",
+                            f"kohya_embedded requirement: changing {package_name} version from {installed_version} to {package_version}",
                         )
                 elif ">=" in package:
                     package_name, package_version = package.split(">=")
@@ -113,7 +123,7 @@ def install_requirements(req_file):
             except Exception as e:
                 print(e)
                 print(
-                    f"Warning: Failed to install {package}, some parts of KohyaSS may not work."
+                    f"Warning: Failed to install {package}, some parts of Kohya_SS may not work."
                 )
 
 if (len(repo_dir) == 0):
@@ -181,6 +191,8 @@ class Script(scripts.Script):
   def ui(self, is_img2img):
     return ()
 
+js = "(x) => confirm('Are you sure?')"
+
 def on_ui_tabs():
     headless = False
     os.chdir(kohya_path)
@@ -239,6 +251,33 @@ def on_ui_tabs():
             </html>
             """
             gr.HTML(htmlStr)
+        if kohya_show_service_tab:
+            with gr.Tab("Service"):
+                with gr.Blocks(analytics_enabled=False) as ui_component:
+                    with gr.Row():
+                        hidden_checkbox = gr.Checkbox(visible=False)
+                        btn = gr.Button("Update Kohya_SS repositorium (not the whole plugin)", elem_id="update_kohya_repo", variant='primary')
+                    with gr.Row():
+                        textbox = gr.Textbox(label="Progress")
+                        num = gr.Number(visible=False)
+            def upd_repo(checkbox_state, number):
+                if checkbox_state:
+                    number += 1
+                today_start = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                err_txt = ''
+                print("Updating kohya repositorium...")
+                try:
+                    repo = git.Repo(kohya_path)
+                    o = repo.remotes.origin
+                    o.pull()
+                except Exception as e:
+                    err_txt = "\nThere was an error:" + str(e)
+                print("Kohya repositorium update done.")
+                today_finish = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                display = f'{today_start} - {today_finish} Kohya repo updated ({number:.0f} times).{err_txt}'
+                return False, display, number
+            btn.click(None, None, hidden_checkbox, _js=js)
+            hidden_checkbox.change(upd_repo, [hidden_checkbox, num], [hidden_checkbox, textbox, num])
     os.chdir(scripts.basedir())
     return [(kohya_embedded, kohya_interface_tab_name, "kohya_embedded")]
 
@@ -303,6 +342,22 @@ def on_ui_settings():
             "Show About tab",
             gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
         )
+    shared.opts.add_option(
+        "kohya_show_service_tab",
+        shared.OptionInfo(
+            kohya_show_service_tab,
+            "Show Service tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    #shared.opts.add_option(
+    #    "kohya_ui_tab_order",
+    #    shared.OptionInfo(
+    #            [],
+    #            "Tab order",
+    #            ui_components.DropdownMulti,
+    #            lambda:{"choices":list(get_kohya_tab_names())}
+    #        ).needs_reload_ui()
+    #    )
 
 
 if module_installed:

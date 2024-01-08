@@ -17,7 +17,7 @@ import gradio as gr
 import argparse
 
 import modules.scripts as scripts
-from modules import script_callbacks
+from modules import script_callbacks, shared
 from modules.shared import opts
 from modules.paths import models_path
 
@@ -26,6 +26,18 @@ from basicsr.utils.download_util import load_file_from_url
 
 CI_VERSION="0.0.1a"
 
+#Default values
+
+kohya_git_repo_path_default = "https://github.com/bmaltais/kohya_ss"
+kohya_interface_tab_name_default = "KohyaSS"
+kohya_show_dreambooth_tab = True
+kohya_show_lora_tab = True
+kohya_show_ti_tab = True
+kohya_show_finetuning_tab = True
+kohya_show_utilities_tab = True
+kohya_show_about_tab = True
+p_category = "training"
+
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
 #root_dir = Path(scripts.basedir()).parent.parent.parent
@@ -33,10 +45,21 @@ root_dir = Path(BASE_PATH).parent.parent
 req_file = os.path.join(Path(BASE_PATH).parent, "requirements.txt")
 kohya_path = os.path.join(Path(BASE_PATH).parent, "kohya")
 
+
 if not os.path.exists(kohya_path):
     os.makedirs(kohya_path)
 
-kohya_git_repo_path="https://github.com/bmaltais/kohya_ss"
+
+kohya_git_repo_path          = shared.opts.data.get("kohya_git_repo_path",         kohya_git_repo_path_default)
+kohya_interface_tab_name     = shared.opts.data.get("kohya_interface_tab_name",    kohya_interface_tab_name_default)
+#Kohya interface tabs
+kohya_show_dreambooth_tab    = shared.opts.data.get("kohya_show_dreambooth_tab",   kohya_show_dreambooth_tab)
+kohya_show_lora_tab          = shared.opts.data.get("kohya_show_lora_tab",         kohya_show_lora_tab)
+kohya_show_ti_tab            = shared.opts.data.get("kohya_show_ti_tab",           kohya_show_ti_tab)
+kohya_show_finetuning_tab    = shared.opts.data.get("kohya_show_finetuning_tab",   kohya_show_finetuning_tab)
+kohya_show_utilities_tab     = shared.opts.data.get("kohya_show_utilities_tab",    kohya_show_utilities_tab)
+kohya_show_about_tab         = shared.opts.data.get("kohya_show_about_tab",        kohya_show_about_tab)
+
 
 repo_dir = os.listdir(kohya_path)
 
@@ -101,15 +124,15 @@ if (len(repo_dir) == 0):
         git.Repo.clone_from(kohya_git_repo_path, kohya_path)
     # And last but not least, we make symlinks for the necessary scripts
     symlinks_required = [
-	"train_textual_inversion.py",
-	"train_db.py",
-	"train_network.py",
-	"train_controlnet.py",
-	"sdxl_train.py",
-	"train_textual_inversion_XTI.py",
-	"sdxl_train_control_net_lllite.py",
-	"sdxl_train_network.py",
-	"sdxl_train_textual_inversion.py"
+        "train_textual_inversion.py",
+        "train_db.py",
+        "train_network.py",
+        "train_controlnet.py",
+        "sdxl_train.py",
+        "train_textual_inversion_XTI.py",
+        "sdxl_train_control_net_lllite.py",
+        "sdxl_train_network.py",
+        "sdxl_train_textual_inversion.py"
     ]
     for sname in symlinks_required:
         if not os.path.isfile(os.path.join(root_dir,sname)):
@@ -148,7 +171,9 @@ class Script(scripts.Script):
     super().__init__()
 
   def title(self):
-    return "Kohya_SS"
+    kohya_interface_tab_name_default = "KohyaSS"
+    kohya_interface_tab_name = shared.opts.data.get("kohya_interface_tab_name", kohya_interface_tab_name_default)
+    return kohya_interface_tab_name
 
   def show(self, is_img2img):
     return scripts.AlwaysVisible
@@ -167,44 +192,119 @@ def on_ui_tabs():
        	with open(os.path.join("./README.md"), "r", encoding="utf8") as file:
             README = file.read()
     with gr.Blocks(analytics_enabled=False) as kohya_embedded:
-        with gr.Tab("Dreambooth"):
-            (
-                train_data_dir_input,
-                reg_data_dir_input,
-                output_dir_input,
-                logging_dir_input,
-            ) = dreambooth_tab(headless=headless)
-        with gr.Tab("LoRA"):
-             lora_tab(headless=headless)
-        with gr.Tab("Textual Inversion"):
-            ti_tab(headless=headless)
-        with gr.Tab("Finetuning"):
-            finetune_tab(headless=headless)
-        with gr.Tab("Utilities"):
-            utilities_tab(
-                train_data_dir_input=train_data_dir_input,
-                reg_data_dir_input=reg_data_dir_input,
-               	output_dir_input=output_dir_input,
-               	logging_dir_input=logging_dir_input,
-                enable_copy_info_button=True,
-                headless=headless,
-            )
+        if kohya_show_dreambooth_tab:
+            with gr.Tab("Dreambooth"):
+                (
+                    train_data_dir_input,
+                    reg_data_dir_input,
+                    output_dir_input,
+                    logging_dir_input,
+                ) = dreambooth_tab(headless=headless)
+        else:
+            train_data_dir_input = None
+            reg_data_dir_input = None
+            output_dir_input = None
+            logging_dir_input = None
+        if kohya_show_lora_tab:
             with gr.Tab("LoRA"):
-                   _ = LoRATools(headless=headless)
-        with gr.Tab("About"):
-            gr.Markdown(f"kohya_ss GUI release {release}")
-            with gr.Tab("README"):
-               	gr.Markdown(README)
-        htmlStr = f"""
-        <html>
-            <body>
-                <div class="ver-class">{release}</div>
-            </body>
-        </html>
-        """
-        gr.HTML(htmlStr)
+                 lora_tab(headless=headless)
+        if kohya_show_ti_tab:
+            with gr.Tab("Textual Inversion"):
+                ti_tab(headless=headless)
+        if kohya_show_finetuning_tab:
+            with gr.Tab("Finetuning"):
+                finetune_tab(headless=headless)
+        if kohya_show_utilities_tab:
+            with gr.Tab("Utilities"):
+                utilities_tab(
+                    train_data_dir_input=train_data_dir_input,
+                    reg_data_dir_input=reg_data_dir_input,
+               	    output_dir_input=output_dir_input,
+               	    logging_dir_input=logging_dir_input,
+                    enable_copy_info_button=True,
+                    headless=headless,
+                )
+                with gr.Tab("LoRA"):
+                       _ = LoRATools(headless=headless)
+        if kohya_show_about_tab:
+            with gr.Tab("About"):
+                gr.Markdown(f"kohya_ss GUI release {release}")
+                with gr.Tab("README"):
+               	    gr.Markdown(README)
+            htmlStr = f"""
+            <html>
+                <body>
+                    <div class="ver-class">{release}</div>
+                </body>
+            </html>
+            """
+            gr.HTML(htmlStr)
     os.chdir(scripts.basedir())
-    return [(kohya_embedded, "KohyaSS", "kohya_embedded")]
+    return [(kohya_embedded, kohya_interface_tab_name, "kohya_embedded")]
+
+
+def on_ui_settings():
+    section = ('training', "KohyaSS")
+    shared.opts.add_option(
+        "kohya_git_repo_path",
+        shared.OptionInfo(
+            kohya_git_repo_path,
+            "Kohya's Git repository URL",
+            section=section, category_id=p_category
+            )
+        )
+    shared.opts.add_option(
+        "kohya_interface_tab_name",
+        shared.OptionInfo(
+            kohya_interface_tab_name,
+            "The KohyaSS tab name in interface",
+            section=section, category_id=p_category
+            ).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_dreambooth_tab",
+        shared.OptionInfo(
+            kohya_show_dreambooth_tab,
+            "Show Dreambooth tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_lora_tab",
+        shared.OptionInfo(
+            kohya_show_lora_tab,
+            "Show LoRA tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_ti_tab",
+        shared.OptionInfo(
+            kohya_show_ti_tab,
+            "Show Textual Inversion tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_finetuning_tab",
+        shared.OptionInfo(
+            kohya_show_finetuning_tab,
+            "Show Finetuning tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_utilities_tab",
+        shared.OptionInfo(
+            kohya_show_utilities_tab,
+            "Show Utilities tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+    shared.opts.add_option(
+        "kohya_show_about_tab",
+        shared.OptionInfo(
+            kohya_show_about_tab,
+            "Show About tab",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+
 
 if module_installed:
     script_callbacks.on_ui_tabs(on_ui_tabs)
+    script_callbacks.on_ui_settings(on_ui_settings)

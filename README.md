@@ -6,7 +6,7 @@ The unification of Kohya_SS and Automatic1111 Stable Diffusion WebUI
 How to use?
 * Install as usual AUTOMATIC1111 plugin.
 * Better add "--skip-install" to the `webui-user.sh` file.
-* I would recommend also fixing the `venv/bin/activate` file like this:
+* I would recommend also fixing the following part `venv/bin/activate` file like this:
   
   `[...]`
   

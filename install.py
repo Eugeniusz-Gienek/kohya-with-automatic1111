@@ -24,7 +24,7 @@ CI_VERSION="0.0.1a"
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-root_dir = Path(scripts.basedir()).parent.parent
+root_dir = Path(scripts.basedir())
 req_file = os.path.join(Path(BASE_PATH), "requirements.txt")
 kohya_path = os.path.join(Path(BASE_PATH), "kohya")
 

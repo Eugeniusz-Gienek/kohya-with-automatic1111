@@ -38,6 +38,8 @@ kohya_show_finetuning_tab = True
 kohya_show_utilities_tab = True
 kohya_show_about_tab = True
 kohya_show_service_tab = True
+kohya_show_ui_tab = True
+
 p_category = "training"
 
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
@@ -61,6 +63,9 @@ kohya_show_finetuning_tab    = shared.opts.data.get("kohya_show_finetuning_tab",
 kohya_show_utilities_tab     = shared.opts.data.get("kohya_show_utilities_tab",    kohya_show_utilities_tab)
 kohya_show_about_tab         = shared.opts.data.get("kohya_show_about_tab",        kohya_show_about_tab)
 kohya_show_service_tab       = shared.opts.data.get("kohya_show_service_tab",      kohya_show_service_tab)
+
+kohya_show_ui_tab            = shared.opts.data.get("kohya_show_ui_tab",           kohya_show_ui_tab)
+
 
 def get_kohya_tab_names():
     return ["dreambooth",
@@ -349,6 +354,14 @@ def on_ui_settings():
             "Show Service tab",
             gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
         )
+    shared.opts.add_option(
+        "kohya_show_ui_tab",
+        shared.OptionInfo(
+            kohya_show_ui_tab,
+            "Show Kohya tab in UI",
+            gr.Checkbox, {"interactive": True}, section=section, category_id=p_category).needs_reload_ui()
+        )
+
     #shared.opts.add_option(
     #    "kohya_ui_tab_order",
     #    shared.OptionInfo(
@@ -361,5 +374,6 @@ def on_ui_settings():
 
 
 if module_installed:
-    script_callbacks.on_ui_tabs(on_ui_tabs)
+    if kohya_show_ui_tab:
+        script_callbacks.on_ui_tabs(on_ui_tabs)
     script_callbacks.on_ui_settings(on_ui_settings)

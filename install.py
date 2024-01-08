@@ -30,6 +30,9 @@ kohya_path = os.path.join(Path(BASE_PATH), "kohya")
 
 kohya_git_repo_path="https://github.com/bmaltais/kohya_ss"
 
+if not os.path.exists(kohya_path):
+    os.makedirs(kohya_path)
+
 repo_dir = os.listdir(kohya_path)
 
 sys.path.append(kohya_path)

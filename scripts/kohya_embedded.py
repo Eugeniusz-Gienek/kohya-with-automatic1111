@@ -32,6 +32,9 @@ root_dir = Path(scripts.basedir()).parent.parent.parent
 req_file = os.path.join(Path(BASE_PATH).parent, "requirements.txt")
 kohya_path = os.path.join(Path(BASE_PATH).parent, "kohya")
 
+if not os.path.exists(kohya_path):
+    os.makedirs(kohya_path)
+
 kohya_git_repo_path="https://github.com/bmaltais/kohya_ss"
 
 repo_dir = os.listdir(kohya_path)

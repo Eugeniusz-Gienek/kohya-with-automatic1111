@@ -5,6 +5,7 @@ The unification of Kohya_SS and Automatic1111 Stable Diffusion WebUI
 
 How to use?
 * Install as usual AUTOMATIC1111 plugin.
+* Better add "--skip-install" to the `webui-user.sh` file.
 
 
 ~~The file sd_requirements.txt is the requirements.txt file for pip which currently works for BOTH kohya_ss and automatic1111 stable diffusion webui project.~~

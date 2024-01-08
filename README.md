@@ -6,7 +6,23 @@ The unification of Kohya_SS and Automatic1111 Stable Diffusion WebUI
 How to use?
 * Install as usual AUTOMATIC1111 plugin.
 * Better add "--skip-install" to the `webui-user.sh` file.
-
+* I would recommend also fixing the following part `venv/bin/activate` file like this:
+  
+  `[...]`
+  
+  `export PATH`
+  
+  `export PYTORCH_CUDA_ALLOC_CONF="backend:cudaMallocAsync"`
+  
+  `export PYTHONWARNINGS="ignore::DeprecationWarning"`
+  
+  `export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:$VIRTUAL_ENV/lib64:$VIRTUAL_ENV/lib:$VIRTUAL_ENV/lib/python3.11/site-packages/tensorrt/:$VIRTUAL_ENV/lib/python3.11/site-packages/onnxruntime/capi:$VIRTUAL_ENV/lib/python3.11/site-packages/:$VIRTUAL_ENV/lib/python3.11/site-packages/nvidia/cufft/lib:$VIRTUAL_ENV/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:$PATH"`
+  
+  `export PYTHONPATH="$VIRTUAL_ENV/lib:$VIRTUAL_ENV/lib/python3.11:$VIRTUAL_ENV/lib/python3.11/site-packages"`
+  `export PATH="$PATH:$VIRTUAL_ENV/lib:$VIRTUAL_ENV/lib/python3.11:$VIRTUAL_ENV/lib/python3.11/site-packages"`
+  
+  `[...]`
+  (if You're using python not 3.11 - change accordingly.)
 
 ~~The file sd_requirements.txt is the requirements.txt file for pip which currently works for BOTH kohya_ss and automatic1111 stable diffusion webui project.~~
 ~~How to use?~~

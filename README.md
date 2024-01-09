@@ -1,7 +1,7 @@
 # kohya-with-automatic1111
 The unification of Kohya_SS and Automatic1111 Stable Diffusion WebUI
 
-(Currently Linux with Nvidia GPU only)
+(Currently verified on Linux with Nvidia GPU only. Theoretically should work on Windows and even MacOS - however I have no opportunity to verify. No hard-code for linux is here ATM.)
 
 How to use?
 * Install as usual AUTOMATIC1111 plugin.

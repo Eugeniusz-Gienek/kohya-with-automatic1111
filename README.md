@@ -6,11 +6,9 @@ The unification of Kohya_SS and Automatic1111 Stable Diffusion WebUI
 How to use?
 * Install as usual AUTOMATIC1111 plugin.
 * Better add "--skip-install" to the `webui-user.sh` file.
-* I would recommend also fixing the following part `venv/bin/activate` file like this:
+* I would recommend also adding to `webui-user.sh` at the end lines like this:
   
-  `[...]`
-  
-  `export PATH`
+  `###########################################################`
   
   `export PYTORCH_CUDA_ALLOC_CONF="backend:cudaMallocAsync"`
   
@@ -20,9 +18,15 @@ How to use?
   
   `export PYTHONPATH="$VIRTUAL_ENV/lib:$VIRTUAL_ENV/lib/python3.11:$VIRTUAL_ENV/lib/python3.11/site-packages"`
   `export PATH="$PATH:$VIRTUAL_ENV/lib:$VIRTUAL_ENV/lib/python3.11:$VIRTUAL_ENV/lib/python3.11/site-packages"`
+
+  `###########################################################`
   
-  `[...]`
   (if You're using python not 3.11 - change accordingly.)
+
+
+
+<details>
+  <summary>Old instructions</summary>
 
 ~~The file sd_requirements.txt is the requirements.txt file for pip which currently works for BOTH kohya_ss and automatic1111 stable diffusion webui project.~~
 ~~How to use?~~
@@ -40,3 +44,4 @@ How to use?
 ~~12. `touch requirements.txt`~~
 ~~13. `mv requirements_linux.txt requirements_linux.txt.backup`~~
 ~~14. we're done with kohya~~
+</details>

@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Tuple, Optional
 from modules import scripts, ui_components
+import torch
 
 import numpy as np
 import cv2
@@ -48,10 +49,15 @@ root_dir = Path(BASE_PATH).parent.parent
 req_file = os.path.join(Path(BASE_PATH).parent, "requirements.txt")
 kohya_path = os.path.join(Path(BASE_PATH).parent, "kohya")
 
-
 if not os.path.exists(kohya_path):
     os.makedirs(kohya_path)
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+if device == "cuda":
+    req_file = os.path.join(Path(BASE_PATH).parent, "requirements_cuda.txt")
+else if device == "cpu":
+    req_file = os.path.join(Path(BASE_PATH).parent, "requirements_cpu.txt")
 
 kohya_git_repo_path          = shared.opts.data.get("kohya_git_repo_path",         kohya_git_repo_path_default)
 kohya_interface_tab_name     = shared.opts.data.get("kohya_interface_tab_name",    kohya_interface_tab_name_default)

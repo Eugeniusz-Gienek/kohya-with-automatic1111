@@ -9,6 +9,7 @@ import json
 from pathlib import Path
 from typing import Tuple, Optional
 from modules import scripts
+import torch
 
 import argparse
 
@@ -19,12 +20,8 @@ from modules.paths import models_path
 
 from basicsr.utils.download_util import load_file_from_url
 
-
-CI_VERSION="0.0.1a"
-
 BASE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-#root_dir = Path(scripts.basedir())
 req_file = os.path.join(Path(BASE_PATH), "requirements.txt")
 root_dir = Path(BASE_PATH).parent.parent
 kohya_path = os.path.join(Path(BASE_PATH), "kohya")
@@ -37,6 +34,13 @@ if not os.path.exists(kohya_path):
 repo_dir = os.listdir(kohya_path)
 
 sys.path.append(kohya_path)
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+if device == "cuda":
+    req_file = os.path.join(Path(BASE_PATH), "requirements_cuda.txt")
+else if device == "cpu":
+    req_file = os.path.join(Path(BASE_PATH), "requirements_cpu.txt")
 
 def comparable_version(version: str) -> Tuple:
     return tuple(version.split("."))

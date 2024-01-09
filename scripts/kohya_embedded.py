@@ -56,7 +56,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 if device == "cuda":
     req_file = os.path.join(Path(BASE_PATH).parent, "requirements_cuda.txt")
-else if device == "cpu":
+elif device == "cpu":
     req_file = os.path.join(Path(BASE_PATH).parent, "requirements_cpu.txt")
 
 kohya_git_repo_path          = shared.opts.data.get("kohya_git_repo_path",         kohya_git_repo_path_default)

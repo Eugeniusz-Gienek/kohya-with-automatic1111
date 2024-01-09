@@ -39,7 +39,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 
 if device == "cuda":
     req_file = os.path.join(Path(BASE_PATH), "requirements_cuda.txt")
-else if device == "cpu":
+elif device == "cpu":
     req_file = os.path.join(Path(BASE_PATH), "requirements_cpu.txt")
 
 def comparable_version(version: str) -> Tuple:

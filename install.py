@@ -70,7 +70,7 @@ def install_requirements(req_file):
                     if installed_version != package_version:
                         launch.run_pip(
                             f"install -U {package}",
-                            f"sd-webui-controlnet requirement: changing {package_name} version from {installed_version} to {package_version}",
+                            f"kohya_embedded requirement: changing {package_name} version from {installed_version} to {package_version}",
                         )
                 elif ">=" in package:
                     package_name, package_version = package.split(">=")
